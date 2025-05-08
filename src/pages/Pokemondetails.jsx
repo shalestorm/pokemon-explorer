@@ -14,13 +14,11 @@ const PokemonDetails = () => {
     const [currentIndex, setCurrentIndex] = useState(null);
     const [prevPokemonData, setPrevPokemonData] = useState(null);
     const [nextPokemonData, setNextPokemonData] = useState(null);
-    const [moves, setMoves] = useState([])
-    const [stats, setStats] = useState([])
-    const [cryUrl, setCryUrl] = useState(null)
-    const [selectedMove, setSelectedMove] = useState(null)
+    const [moves, setMoves] = useState([]);
+    const [stats, setStats] = useState([]);
+    const [cryUrl, setCryUrl] = useState(null);
+    const [selectedMove, setSelectedMove] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -38,7 +36,6 @@ const PokemonDetails = () => {
                 setMoves(currentData.moves);
                 setStats(currentData.stats);
                 setCryUrl(currentData.cries.latest);
-                console.log(cryUrl)
 
                 if (idx > 0) {
                     const prevId = listData.results[idx - 1].url.split('/').filter(Boolean).pop();
@@ -56,9 +53,6 @@ const PokemonDetails = () => {
                 } else {
                     setNextPokemonData(null);
                 }
-                const pokeLen = pokemonList.length;
-                console.log(pokeLen)
-
             } catch (e) {
                 setError(e);
             }
@@ -67,12 +61,10 @@ const PokemonDetails = () => {
         fetchAllData();
     }, [id]);
 
-
     const isSTAB = (move) => {
         const pokemonTypes = pokemon.types.map((type) => type.type.name);
         return move.type && pokemonTypes.includes(move.type);
     };
-
 
     const cleanMovesData = () => {
         const categorizedMoves = {
@@ -87,7 +79,6 @@ const PokemonDetails = () => {
             const learnMethods = move.version_group_details.map((group) => group.move_learn_method.name);
             const learnLevels = move.version_group_details.map((group) => group.level_learned_at);
 
-
             const uniqueGameVersions = [...new Set(gameVersions)];
             const uniqueLearnMethods = [...new Set(learnMethods)];
             const uniqueLearnLevels = [...new Set(learnLevels)];
@@ -100,7 +91,6 @@ const PokemonDetails = () => {
                 type: move.move.name === 'gust' ? 'flying' : undefined,
             };
 
-
             if (moveData.learnMethods.includes('level-up')) {
                 categorizedMoves.levelUp.push(moveData);
             } else if (moveData.learnMethods.includes('machine')) {
@@ -112,15 +102,46 @@ const PokemonDetails = () => {
             }
         });
 
-
         Object.keys(categorizedMoves).forEach((key) => {
             categorizedMoves[key].sort((a, b) => a.move.localeCompare(b.move));
         });
 
         return categorizedMoves;
     };
-    const categorizedMoves = cleanMovesData();
 
+    const fetchMoveDetails = async (moveName) => {
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/move/${moveName}`);
+            const moveDetails = await res.json();
+            return {
+                power: moveDetails.power,
+                accuracy: moveDetails.accuracy,
+                description: moveDetails.effect_entries.find((entry) => entry.language.name === 'en')?.short_effect,
+                type: moveDetails.type.name,
+            };
+        } catch (error) {
+            console.error("Failed to fetch move details:", error);
+        }
+    };
+
+    const openModal = async (move) => {
+        const moveDetails = await fetchMoveDetails(move.move);
+        setSelectedMove({
+            ...move,
+            ...moveDetails,
+        });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedMove(null);
+    };
+
+    if (!pokemon || currentIndex === null) return <p>Loading - please wait...</p>;
+    if (error) return <p>Error: {error.message}</p>;
+
+    const categorizedMoves = cleanMovesData();
 
     const playCry = () => {
         if (cryUrl) {
@@ -130,31 +151,11 @@ const PokemonDetails = () => {
         }
     };
 
-
-    const openModal = (move) => {
-        setSelectedMove(move);
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSelectedMove(null);
-    };
-
-
-    if (!pokemon || currentIndex === null) return <p>Loading - please wait...</p>;
-    if (error) return <p>Error: {error.message}</p>;
-
-
-
     const MAX_STAT = 255;
 
-
     return (
-
         <div className="container">
             <Link className='back-to-dex' to="/pokedex">Back to Pokedex</Link>
-
             <div className="pokes-imgs">
                 <img src={pokemon.sprites.front_default} className='special' alt={`${pokemon.name}`} />
                 <img src={pokemon.sprites.front_shiny} className='special' alt={`${pokemon.name}`} />
@@ -190,8 +191,8 @@ const PokemonDetails = () => {
                         </Link>
                     )}
                 </div>
-
             </div>
+
             <div className='more-info-stat'>
                 <h2>Stats</h2>
                 <ul className="stat-bars">
@@ -216,9 +217,9 @@ const PokemonDetails = () => {
                     })}
                 </ul>
             </div>
+
             <div className='more-info'>
                 <h1>Moves</h1>
-
                 <div className='how'>
                     <h1>By Leveling Up</h1>
                     <ul>
@@ -226,7 +227,6 @@ const PokemonDetails = () => {
                             <li key={index} className={isSTAB(move) ? 'stab' : ''} onClick={() => openModal(move)}>
                                 <h3>{move.move}</h3>
                                 <strong>Learned at levels: {move.learnLevels.join(', ')}</strong>
-
                             </li>
                         ))}
                     </ul>
@@ -238,7 +238,6 @@ const PokemonDetails = () => {
                             <li key={index} className={isSTAB(move) ? 'stab' : ''} onClick={() => openModal(move)}>
                                 <h3>{move.move}</h3>
                                 <strong>Learned at levels: {move.learnLevels.join(', ')}</strong>
-
                             </li>
                         ))}
                     </ul>
@@ -250,22 +249,22 @@ const PokemonDetails = () => {
                             <li key={index} className={isSTAB(move) ? 'stab' : ''} onClick={() => openModal(move)}>
                                 <h3>{move.move}</h3>
                                 <strong>Learned at levels: {move.learnLevels.join(', ')}</strong>
-
                             </li>
                         ))}
                     </ul>
                 </div>
-
             </div>
+
             {isModalOpen && (
                 <Modal onClose={closeModal} theme={theme}>
                     <h2>{selectedMove.move}</h2>
-                    <p><strong>Learn Method:</strong> {selectedMove.learnMethods.join(', ')}</p>
-                    <p><strong>Game Versions:</strong> {selectedMove.gameVersions.join(', ')}</p>
-                    <p><strong>Learn Levels:</strong> {selectedMove.learnLevels.join(', ')}</p>
+                    <p><strong>Type:</strong> {selectedMove.type}</p>
+                    <p><strong>Power:</strong> {selectedMove.power || 'N/A'}</p>
+                    <p><strong>Accuracy:</strong> {selectedMove.accuracy || 'N/A'}</p>
+                    <p><strong>Description:</strong> {selectedMove.description || 'No description available.'}</p>
                 </Modal>
             )}
-        </div >
+        </div>
     );
 };
 
