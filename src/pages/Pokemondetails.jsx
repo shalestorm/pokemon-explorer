@@ -109,6 +109,11 @@ const PokemonDetails = () => {
             }
         });
 
+
+        Object.keys(categorizedMoves).forEach((key) => {
+            categorizedMoves[key].sort((a, b) => a.move.localeCompare(b.move));
+        });
+
         return categorizedMoves;
     };
     const categorizedMoves = cleanMovesData();
