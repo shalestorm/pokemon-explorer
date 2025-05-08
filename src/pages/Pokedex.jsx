@@ -19,10 +19,14 @@ const Pokedex = () => {
     const { theme, toggleTheme } = useContext(ThemeContext);
     const [totalCount, setTotalCount] = useState(0)
     const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [allPokemon, setAllPokemon] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
 
 
     useEffect(() => {
+        if (isSearching) return;
         const fetchPokemon = async () => {
             setLoading(true);
             setError(null);
@@ -51,7 +55,7 @@ const Pokedex = () => {
         };
 
         fetchPokemon();
-    }, [offset]);
+    }, [offset, isSearching]);
 
 
 
@@ -68,6 +72,48 @@ const Pokedex = () => {
     }, [offset, navigate]);
 
 
+    useEffect(() => {
+        const fetchAllPokemon = async () => {
+            try {
+                const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0');
+                const data = await res.json();
+                setAllPokemon(data.results); // [{ name, url }]
+            } catch (e) {
+                console.error('Failed to fetch all Pokémon names', e);
+            }
+        };
+        fetchAllPokemon();
+    }, []);
+
+
+    useEffect(() => {
+        const searchPokemon = async () => {
+            if (searchTerm === '') {
+                setIsSearching(false);
+                setPokemonList([]);
+                return;
+            }
+
+            setIsSearching(true);
+            const filtered = allPokemon.filter(p => p.name.includes(searchTerm.toLowerCase()));
+            const results = [];
+
+            for (const p of filtered.slice(0, 20)) { // limit result size
+                try {
+                    const res = await fetch(p.url);
+                    const data = await res.json();
+                    results.push(data);
+                } catch (e) {
+                    console.error(`Error loading ${p.name}`, e);
+                }
+            }
+            setPokemonList(results);
+        };
+
+        searchPokemon();
+    }, [searchTerm]);
+
+
     return (
         <div>
             <button onClick={toggleTheme}>
@@ -81,6 +127,15 @@ const Pokedex = () => {
                     <button onClick={() => { setOffset(offset - 20); }} disabled={offset === 0}>
                         Page Left
                     </button>
+                </div>
+                <div className='button-pairs'>
+                    <input
+                        type="text"
+                        placeholder="Search Pokémon..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button onClick={() => setSearchTerm('')}>Clear</button>
                 </div>
                 <div className="button-pairs">
                     <button onClick={() => { setOffset(offset + 20); }} disabled={offset + 20 >= totalCount}>

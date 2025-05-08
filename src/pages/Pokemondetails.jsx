@@ -16,6 +16,9 @@ const PokemonDetails = () => {
     const [moves, setMoves] = useState([])
     const [stats, setStats] = useState([])
     const [cryUrl, setCryUrl] = useState(null)
+    const [searchTerm, setSearchTerm] = useState('');
+    const [allPokemon, setAllPokemon] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
 
 
