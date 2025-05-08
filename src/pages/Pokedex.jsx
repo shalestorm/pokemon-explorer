@@ -77,7 +77,7 @@ const Pokedex = () => {
             try {
                 const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0');
                 const data = await res.json();
-                setAllPokemon(data.results); // [{ name, url }]
+                setAllPokemon(data.results);
             } catch (e) {
                 console.error('Failed to fetch all Pokémon names', e);
             }
@@ -98,7 +98,7 @@ const Pokedex = () => {
             const filtered = allPokemon.filter(p => p.name.includes(searchTerm.toLowerCase()));
             const results = [];
 
-            for (const p of filtered.slice(0, 20)) { // limit result size
+            for (const p of filtered.slice(0, 20)) {
                 try {
                     const res = await fetch(p.url);
                     const data = await res.json();
@@ -123,8 +123,8 @@ const Pokedex = () => {
 
 
                 <div className="button-pairs">
-                    <button onClick={goToStart} disabled={offset === 0}>Start</button>
-                    <button onClick={() => { setOffset(offset - 20); }} disabled={offset === 0}>
+                    <button onClick={goToStart} disabled={isSearching || offset === 0}>Start</button>
+                    <button onClick={() => { setOffset(offset - 20); }} disabled={isSearching || offset === 0}>
                         Page Left
                     </button>
                 </div>
@@ -138,10 +138,10 @@ const Pokedex = () => {
                     <button onClick={() => setSearchTerm('')}>Clear</button>
                 </div>
                 <div className="button-pairs">
-                    <button onClick={() => { setOffset(offset + 20); }} disabled={offset + 20 >= totalCount}>
+                    <button onClick={() => { setOffset(offset + 20); }} disabled={isSearching || offset + 20 >= totalCount}>
                         Page Right
                     </button>
-                    <button onClick={goToEnd} disabled={offset + 20 >= totalCount}>End</button>
+                    <button onClick={goToEnd} disabled={isSearching || offset + 20 >= totalCount}>End</button>
                 </div>
 
             </div>
