@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
 import clsx from 'clsx';
+import Modal from './Modal';
 
 const PokemonDetails = () => {
     const { id } = useParams();
@@ -16,7 +17,8 @@ const PokemonDetails = () => {
     const [moves, setMoves] = useState([])
     const [stats, setStats] = useState([])
     const [cryUrl, setCryUrl] = useState(null)
-
+    const [selectedMove, setSelectedMove] = useState(null)
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
 
 
@@ -129,6 +131,17 @@ const PokemonDetails = () => {
     };
 
 
+    const openModal = (move) => {
+        setSelectedMove(move);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedMove(null);
+    };
+
+
     if (!pokemon || currentIndex === null) return <p>Loading - please wait...</p>;
     if (error) return <p>Error: {error.message}</p>;
 
@@ -138,6 +151,7 @@ const PokemonDetails = () => {
 
 
     return (
+
         <div className="container">
             <Link className='back-to-dex' to="/pokedex">Back to Pokedex</Link>
 
@@ -209,7 +223,7 @@ const PokemonDetails = () => {
                     <h1>By Leveling Up</h1>
                     <ul>
                         {categorizedMoves.levelUp.map((move, index) => (
-                            <li key={index} className={isSTAB(move) ? 'stab' : ''}>
+                            <li key={index} className={isSTAB(move) ? 'stab' : ''} onClick={() => openModal(move)}>
                                 <h3>{move.move}</h3>
                                 <strong>Learned at levels: {move.learnLevels.join(', ')}</strong>
 
@@ -221,7 +235,7 @@ const PokemonDetails = () => {
                     <h1>By TM</h1>
                     <ul>
                         {categorizedMoves.tm.map((move, index) => (
-                            <li key={index} className={isSTAB(move) ? 'stab' : ''}>
+                            <li key={index} className={isSTAB(move) ? 'stab' : ''} onClick={() => openModal(move)}>
                                 <h3>{move.move}</h3>
                                 <strong>Learned at levels: {move.learnLevels.join(', ')}</strong>
 
@@ -233,7 +247,7 @@ const PokemonDetails = () => {
                     <h1>By Egg</h1>
                     <ul>
                         {categorizedMoves.egg.map((move, index) => (
-                            <li key={index} className={isSTAB(move) ? 'stab' : ''}>
+                            <li key={index} className={isSTAB(move) ? 'stab' : ''} onClick={() => openModal(move)}>
                                 <h3>{move.move}</h3>
                                 <strong>Learned at levels: {move.learnLevels.join(', ')}</strong>
 
@@ -243,6 +257,14 @@ const PokemonDetails = () => {
                 </div>
 
             </div>
+            {isModalOpen && (
+                <Modal onClose={closeModal} theme={theme}>
+                    <h2>{selectedMove.move}</h2>
+                    <p><strong>Learn Method:</strong> {selectedMove.learnMethods.join(', ')}</p>
+                    <p><strong>Game Versions:</strong> {selectedMove.gameVersions.join(', ')}</p>
+                    <p><strong>Learn Levels:</strong> {selectedMove.learnLevels.join(', ')}</p>
+                </Modal>
+            )}
         </div >
     );
 };
