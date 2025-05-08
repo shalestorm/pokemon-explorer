@@ -111,7 +111,3 @@ button:hover {
   font-size: 1.25rem;
   cursor: pointer;
 }
-
-.img:hover {
-  animation: bounce 0.5s ease-in-out infinite;
-}
