@@ -16,9 +16,7 @@ const PokemonDetails = () => {
     const [moves, setMoves] = useState([])
     const [stats, setStats] = useState([])
     const [cryUrl, setCryUrl] = useState(null)
-    const [searchTerm, setSearchTerm] = useState('');
-    const [allPokemon, setAllPokemon] = useState([]);
-    const [isSearching, setIsSearching] = useState(false);
+
 
 
 
@@ -141,7 +139,7 @@ const PokemonDetails = () => {
 
     return (
         <div className="container">
-            <Link to="/pokedex">Back to Pokedex</Link>
+            <Link className='back-to-dex' to="/pokedex">Back to Pokedex</Link>
 
             <div className="pokes-imgs">
                 <img src={pokemon.sprites.front_default} className='special' alt={`${pokemon.name}`} />
