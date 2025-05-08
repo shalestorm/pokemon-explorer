@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
 import clsx from 'clsx';
-import Modal from './Modal';
+import Modal from '../Modal';
 
 const PokemonDetails = () => {
     const { id } = useParams();
