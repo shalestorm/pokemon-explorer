@@ -6,7 +6,9 @@ import clsx from 'clsx'
 
 const Pokedex = () => {
     const getInitialOffset = () => {
-        const queryParams = new URLSearchParams(window.location.search);
+        const hash = window.location.hash;
+        const queryString = hash.includes('?') ? hash.split('?')[1] : '';
+        const queryParams = new URLSearchParams(queryString);
         const offset = queryParams.get('offset');
         return offset ? parseInt(offset, 10) : 0;
     };
